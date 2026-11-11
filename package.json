@@ -1,0 +1,46 @@
+{
+  "name": "mental-okey-101",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "test:okey": "tsx --test src/okey-rules.test.ts",
+    "test:rack": "tsx --test src/rack-layout.test.ts",
+    "test:dev-panel": "tsx --test server/dev-test-panel.test.ts",
+    "test:bot": "tsx --test server/bot-ai.test.ts",
+    "test:server-integration": "tsx --test server/socket-lifecycle.integration.test.ts server/auto-mode.integration.test.ts server/waiting-room-seats.test.ts",
+    "test:accounts": "tsx --test server/account-store.test.ts server/http-config.test.ts server/invite-code.test.ts",
+    "test:coins": "tsx --test server/account-store.test.ts server/mental-coin-rewards.test.ts server/coin-room-state.test.ts",
+    "test:guidance": "tsx --test shared/turn-guidance.test.ts src/turn-guidance.test.ts",
+    "preview": "vite preview",
+    "server": "tsx server/index.ts",
+    "dev:server": "pnpm server"
+  },
+  "dependencies": {
+    "@elastic/datemath": "latest",
+    "@elastic/eui": "latest",
+    "@elastic/eui-theme-borealis": "latest",
+    "@emotion/css": "^11.13.5",
+    "@emotion/react": "^11.14.0",
+    "dotenv": "^18.0.10",
+    "moment": "^2.30.1",
+    "pg": "^8.23.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "socket.io-client": "^4.8.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "socket.io": "^4.8.4",
+    "tsx": "^4.23.15",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0"
+  }
+}
