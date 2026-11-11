@@ -1,8 +1,10 @@
 import 'dotenv/config';
 import { createServer } from 'node:http';
+import { dirname, resolve } from 'node:path';
 import { networkInterfaces } from 'node:os';
 import { randomBytes } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
+import { fileURLToPath } from 'node:url';
 import { Server } from 'socket.io';
 import { freshRoom, startRound, startNewMatch, validateTableSettings, drawStock, takeDiscard, returnTakenDiscard, discardTile, openMelds, openSeriesMelds, layNewSeriesMelds, layNewPairMelds, finishFromHand, recordInvalidOpenAttempt, recordSuccessfulOpeningAttempt, undoOpenMelds, addToMeld, reclaimRealOkey, publicGame, startTurnClock, clearTurnClock, turnClockExpired, autoPlayTimedOutTurn, recordRoundBadges, roundSummaryDurationMs, ROUND_SUMMARY_DURATION_MS, MATCH_SUMMARY_DURATION_MS, findRackMeldGroups, isRealOkey, isValidPair, updateRealOkeyRecognition, collectOpeningMeld, appendPersonalNotification, type GameState, type Player, type MeldLayTarget } from '../shared/game.js';
 import { applyDevTestTiles, devTestPanelIsEnabled, getDevTestInventory, openPreparedDevPlayer, prepareDevOpeningHands, requireDevTestOwner, swapDevTestTiles, type DevOpeningPreparationKind } from './dev-test-panel.js';
@@ -14,45 +16,15 @@ import { syncRoomPlayerCoinBalances } from './coin-room-state.js';
 import { findPlayerInteractionItem, PLAYER_INTERACTION_COOLDOWN_MS } from '../shared/player-interactions.js';
 import { releaseExpiredWaitingSeat, WaitingRoomSeatTimers, type WaitingSeatReservation } from './waiting-room-seats.js';
 import { clientOriginIsAllowed, resolveAllowedClientOrigins } from './http-config.js';
+import { createHttpRequestHandler } from './http-app.js';
 import { registrationInviteFailure } from './invite-code.js';
 
 type Session={id:string;room:string};
 const localClientOrigins=process.env.NODE_ENV==='production'?[]:Object.values(networkInterfaces()).flatMap(entries=>entries||[]).filter(entry=>!entry.internal&&entry.family==='IPv4').map(entry=>`http://${entry.address}:5173`);
 const allowedClientOrigins=resolveAllowedClientOrigins(process.env,localClientOrigins);
 const isClientOriginAllowed=(origin:string|undefined)=>clientOriginIsAllowed(origin,allowedClientOrigins);
-const httpServer=createServer((request,response)=>{
-  if((request.url||'').split('?')[0]!=='/healthz')return;
-  const origin=typeof request.headers.origin==='string'?request.headers.origin:undefined;
-  if(!isClientOriginAllowed(origin)){
-    response.statusCode=403;
-    response.setHeader('Cache-Control','no-store');
-    response.end();
-    return;
-  }
-  if(origin){response.setHeader('Access-Control-Allow-Origin',origin);response.setHeader('Vary','Origin');}
-  response.setHeader('Cache-Control','no-store');
-  if(request.method==='OPTIONS'){
-    response.setHeader('Access-Control-Allow-Methods','GET, OPTIONS');
-    response.statusCode=204;
-    response.end();
-    return;
-  }
-  if(request.method!=='GET'){
-    response.statusCode=405;
-    response.setHeader('Allow','GET, OPTIONS');
-    response.end();
-    return;
-  }
-  void accountStore.healthCheck().then(healthy=>{
-    response.statusCode=healthy?200:503;
-    response.setHeader('Content-Type','application/json; charset=utf-8');
-    response.end(JSON.stringify({status:healthy?'ok':'unavailable'}));
-  }).catch(()=>{
-    response.statusCode=503;
-    response.setHeader('Content-Type','application/json; charset=utf-8');
-    response.end(JSON.stringify({status:'unavailable'}));
-  });
-});
+const distDirectory=resolve(dirname(fileURLToPath(import.meta.url)),'../dist');
+const httpServer=createServer(createHttpRequestHandler({distDirectory,healthCheck:()=>accountStore.healthCheck(),isClientOriginAllowed}));
 const io=new Server(httpServer,{cors:{origin:(origin,callback)=>callback(null,isClientOriginAllowed(origin)),methods:['GET','POST']},allowRequest:(request,callback)=>callback(null,isClientOriginAllowed(request.headers.origin)),pingInterval:20000,pingTimeout:30000});
 const rooms=new Map<string,GameState>();const sessions=new Map<string,Session>();const activeAccountSockets=new Map<string,string>();const matchRestartTimers=new Map<string,{matchId:string;timer:ReturnType<typeof setTimeout>}>();const turnTimers=new Map<string,{matchId:string;turnId:string;timer:ReturnType<typeof setTimeout>}>();let turnSequence=0;
 const roundRestartTimers=new Map<string,{matchId:string;round:number;restartAt:number;timer:ReturnType<typeof setTimeout>}>();

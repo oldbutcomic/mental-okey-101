@@ -11,7 +11,7 @@
     "test:rack": "tsx --test src/rack-layout.test.ts",
     "test:dev-panel": "tsx --test server/dev-test-panel.test.ts",
     "test:bot": "tsx --test server/bot-ai.test.ts",
-    "test:server-integration": "tsx --test server/socket-lifecycle.integration.test.ts server/auto-mode.integration.test.ts server/waiting-room-seats.test.ts",
+    "test:server-integration": "tsx --test server/socket-lifecycle.integration.test.ts server/auto-mode.integration.test.ts server/waiting-room-seats.test.ts server/http-app.test.ts",
     "test:accounts": "tsx --test server/account-store.test.ts server/http-config.test.ts server/invite-code.test.ts",
     "test:coins": "tsx --test server/account-store.test.ts server/mental-coin-rewards.test.ts server/coin-room-state.test.ts",
     "test:guidance": "tsx --test shared/turn-guidance.test.ts src/turn-guidance.test.ts",

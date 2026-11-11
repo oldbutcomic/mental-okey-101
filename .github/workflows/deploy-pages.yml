@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
       - uses: pnpm/action-setup@v4
         with:
           version: 9.15.9
@@ -25,7 +27,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
         env:
-          VITE_SERVER_URL: https://mental-okey-server.onrender.com
+          VITE_BASE_PATH: /mental-okey-101/
+          VITE_SERVER_URL: https://mental-okey-101.onrender.com
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

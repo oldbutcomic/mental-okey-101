@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: mental-okey-server
+    name: mental-okey-101
     runtime: node
     plan: free
-    buildCommand: corepack pnpm install --frozen-lockfile
+    buildCommand: corepack pnpm install --frozen-lockfile && VITE_BASE_PATH=/ corepack pnpm build
     startCommand: corepack pnpm run server
     healthCheckPath: /healthz
     envVars:
@@ -14,7 +14,7 @@ services:
       - key: ENABLE_TEST_PANEL
         value: "false"
       - key: CLIENT_ORIGIN
-        value: https://arkadas.github.io
+        value: "https://mental-okey-101.onrender.com,https://oldbutcomic.github.io"
       - key: DATABASE_URL
         sync: false
       - key: BETA_INVITE_CODE

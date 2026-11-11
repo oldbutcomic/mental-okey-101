@@ -20,8 +20,7 @@ Keep any database connection URL private and never commit `.env`. The test suite
 
 ## Free deployment
 
-- Push this folder as the root of a public GitHub repository. Enable GitHub Pages with **GitHub Actions** as the build source.
-- Create a persistent PostgreSQL database with a provider of your choice, then create a Render Web Service from the repository and apply `render.yaml`. Set its secret `DATABASE_URL` environment variable to the database URL. The service starts a Node.js + Socket.IO server at `https://mental-okey-server.onrender.com`.
-- If the GitHub Pages owner differs from `arkadas`, change `CLIENT_ORIGIN` in `render.yaml` to the exact Pages origin and the `VITE_SERVER_URL` value in `.github/workflows/deploy-pages.yml` to the Render service URL, then redeploy both.
+- Create a persistent PostgreSQL database with a provider of your choice, then configure the existing Render Web Service from `render.yaml`. Set its secret `DATABASE_URL` environment variable to the database URL. The service builds the React app and serves it together with the Node.js + Socket.IO backend at `https://mental-okey-101.onrender.com`.
+- The same repository can also publish its frontend on GitHub Pages at `https://oldbutcomic.github.io/mental-okey-101/`. That optional deployment uses its own Vite base path and connects back to the Render backend.
 
 Render's free service may sleep after inactivity or restart; an in-memory room is lost on restart. The free tier is suitable for a friends' prototype, not an always-on service. The current workspace includes deploy configuration but is not connected to your GitHub or Render accounts, so it is not yet available as a public website.
